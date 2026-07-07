@@ -36,7 +36,7 @@ export default async function handler(req, res) {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model: "claude-sonnet-5",
         max_tokens: 1000,
         system: SYSTEM,
         messages: [
@@ -49,12 +49,19 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Anthropic API error:", data);
+      return res.status(502).json({ error: data.error?.message || "Anthropic API request failed" });
+    }
+
     const text = data.content?.find((b) => b.type === "text")?.text || "";
     const clean = text.replace(/```json|```/g, "").trim();
     const headlines = JSON.parse(clean);
 
     return res.status(200).json({ headlines });
   } catch (e) {
-    return res.status(500).json({ error: "Generation failed" });
+    console.error("Generation failed:", e);
+    return res.status(500).json({ error: e.message || "Generation failed" });
   }
 }

@@ -44,7 +44,7 @@ export default function Home() {
       if (data.error) throw new Error(data.error);
       setHeadlines(data.headlines);
     } catch (e) {
-      setError("Generation failed. Try again.");
+      setError(e.message || "Generation failed. Try again.");
     }
     setLoading(false);
   };
